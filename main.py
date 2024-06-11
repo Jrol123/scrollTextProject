@@ -50,7 +50,12 @@ for i, item in enumerate(name_list):
 percentile = diff_pos_y // step
 print(percentile, diff_pos_y / step)
 
-count_iter = percentile * (len(name_list) - 9)  # 340
+count_cycles = len(name_list) - 0
+"""Количество прокруток.
+
+По-умолчанию один полный круг [len(name_list) шагов]"""
+
+count_iter = percentile * count_cycles
 print(count_iter)
 
 for i in range(count_iter):
