@@ -21,7 +21,7 @@ diff_pos_y = font_size + font_size // 16
 
 y_mid = height // 2 - font_size // 2
 
-step = 
+step = 5
 
 # print((y_mid + font_size) / step)
 half_rot = (y_mid + font_size) / step
