@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw, ImageFont
 color_text = (0, 0, 0)
 """Цвет текста"""
 
-color_background = (255, 255, 255)
+color_background = (250, 250, 250)
 """Цвет фона"""
 
 height = 1200
@@ -13,7 +13,9 @@ font_size = 160
 
 myFont = ImageFont.truetype(r"C:\Users\artem\AppData\Local\Microsoft\Windows\Fonts\Rubik-Regular.ttf", font_size)
 
-start_pos_x = myFont.getlength('Спокойной ночи, ') + 10
+border = 10
+"""Отступ от левой стенки"""
+start_pos_x = myFont.getlength('Спокойной ночи, ') + border
 """Стартовая позиция для написания имени"""
 
 max_len_name = myFont.getlength('Даниил')
@@ -56,15 +58,6 @@ class Person:
         d.text(self.coords, self.name, fill=self.color, font=font)
 
 
-koef = 85  # TODO: Сделать авто-скалирующийся коэффициент
-"""Коэффициент ширины. Подобран вручную.
-
-Можно сделать массив с буквами и отношением высоты к ширине, и затем всё отмерять, но...
-
-+ на всё это влияет шрифт...
-
-Переделать ширину под выделяемое пространство на наиболее длинное имя через getlength"""
-
 diff_pos_y = font_size + font_size // 16
 """Разница в позициях между строками текста.
 
@@ -87,8 +80,11 @@ start_pos_y = height - font_size - font_size // 16
 
 print(start_pos_y, y_mid + 3 * diff_pos_y)
 
-name_list = [Person('Артём'), Person('Влад'), Person('Сашак'), Person('Алиса'), Person('Серёжа'),
-             Person('Аля'), Person("Даниил"), Person("Денис"), Person("Саша"), Person("Дина")]
+name_list = [Person('Артём', (255, 166, 48)), Person('Влад', (130, 232, 186)),
+             Person('Сашак', (77, 161, 169)), Person('Алиса', (46, 80, 119)),
+             Person('Серёжа', (97, 28, 53)), Person('Аля', (255, 111, 89)),
+             Person("Даниил", (37, 68, 65)), Person("Денис", (67, 170, 139)),
+             Person("Саша", (178, 176, 255)), Person("Дина", (239, 48, 84))]
 """Список людей"""
 
 end_pos = start_pos_y - diff_pos_y * (len(name_list) - 1)
@@ -114,7 +110,7 @@ print(count_iter)
 
 im_base = Image.new('RGB', (width, height), color_background)
 d_base = ImageDraw.Draw(im_base)
-d_base.text((10, y_mid), "Спокойной ночи, ", fill=color_text, font=myFont)
+d_base.text((border, y_mid), "Спокойной ночи, ", fill=color_text, font=myFont)
 d_base.text((start_pos_x + max_len_name, y_mid), " !", fill=color_text, font=myFont)
 
 """Заготовка заднего фона"""
