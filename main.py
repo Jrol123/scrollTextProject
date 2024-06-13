@@ -13,26 +13,34 @@ font_size = 160
 
 myFont = ImageFont.truetype(r"C:\Users\artem\AppData\Local\Microsoft\Windows\Fonts\Rubik-Regular.ttf", font_size)
 
+start_pos_x = myFont.getlength('Спокойной ночи, ') + 10
+"""Стартовая позиция для написания имени"""
+
+max_len_name = myFont.getlength('Даниил')
+"""Длина самого длинного имени"""
+
 
 class Person:
     """
 
     :var name: Имя человека
+    :type name: str
     :var color: Цвет текста для человека
+    :type color: str | tuple[int, int, int]
     :var coords: Координаты текста. Считаются от левого верхнего угла картинки
+    :type coords: list[float, float]
 
     """
 
-    def __init__(self, name: str, x_coord: float, color: str | tuple[int, int, int] = color_text) -> None:
+    def __init__(self, name: str, color: str | tuple[int, int, int] = color_text) -> None:
         """
 
         :param name: Имя
-        :param x_coord: Координата по OX
         :param color: Цвет имени
 
         """
         self.name = name
-        self.coords = [x_coord, 0]
+        self.coords = [start_pos_x + (max_len_name - myFont.getlength(name)) / 2, 0]
         self.color = color
 
     def draw(self, d: ImageDraw.ImageDraw, font: ImageFont.FreeTypeFont = myFont) -> None:
@@ -57,17 +65,6 @@ koef = 85  # TODO: Сделать авто-скалирующийся коэфф
 
 Переделать ширину под выделяемое пространство на наиболее длинное имя через getlength"""
 
-print(myFont.getlength('Даниил') + 20 * 2)
-
-name_list = [Person('Артём', koef * (16 + 0.25)), Person('Влад', koef * (16 + 0.25)),
-             Person('Сашак', koef * (16 + 0.25)), Person('Алиса', koef * (16 + 0.25)),
-             Person('Серёжа', koef * (16 + 0.25)), Person('Аля', koef * (16 + 0.25)),
-             Person("Даниил", koef * (16 + 0.25)), Person("Денис", koef * (16 + 0.25)),
-             Person("Саша", koef * (16 + 0.25)), Person("Дина", koef * (16 + 0.25))]
-"""Список имён с положением на экране формата (x, y).
-
-Коэффициент 0.25 стоит изменить, если нужно центрирование"""
-
 diff_pos_y = font_size + font_size // 16
 """Разница в позициях между строками текста.
 
@@ -85,18 +82,22 @@ step = 5
 frames = []
 """Массив кадров"""
 
-start_pos = height - font_size - font_size // 16
+start_pos_y = height - font_size - font_size // 16
 """Нижняя позиция."""
 
-print(start_pos, y_mid + 3 * diff_pos_y)
+print(start_pos_y, y_mid + 3 * diff_pos_y)
 
-end_pos = start_pos - diff_pos_y * (len(name_list) - 1)
+name_list = [Person('Артём'), Person('Влад'), Person('Сашак'), Person('Алиса'), Person('Серёжа'),
+             Person('Аля'), Person("Даниил"), Person("Денис"), Person("Саша"), Person("Дина")]
+"""Список людей"""
+
+end_pos = start_pos_y - diff_pos_y * (len(name_list) - 1)
 """Верхняя позиция.
 
 В неё переносится текст после выхода за нижнюю часть экрана."""
 
 for i, item in enumerate(name_list):
-    item.coords[1] = start_pos - diff_pos_y * i
+    item.coords[1] = start_pos_y - diff_pos_y * i
 
 percentile = diff_pos_y // step
 """Вычисление количества шагов, необходимых для того, чтобы текст вышел за нижнюю границу картинки"""
@@ -114,7 +115,7 @@ print(count_iter)
 im_base = Image.new('RGB', (width, height), color_background)
 d_base = ImageDraw.Draw(im_base)
 d_base.text((10, y_mid), "Спокойной ночи, ", fill=color_text, font=myFont)
-d_base.text((koef * (16 + 7.5), y_mid), "!", fill=color_text, font=myFont)
+d_base.text((start_pos_x + max_len_name, y_mid), " !", fill=color_text, font=myFont)
 
 """Заготовка заднего фона"""
 
@@ -143,6 +144,6 @@ frames[0].save(
     save_all=True,
     append_images=frames[1:],
     optimize=True,
-    duration=25,
+    duration=30,
     loop=0
 )
