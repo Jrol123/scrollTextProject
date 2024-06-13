@@ -1,7 +1,10 @@
 from PIL import Image, ImageDraw, ImageFont
 
-color = (0, 0, 0)
+color_text = (0, 0, 0)
 """Цвет текста"""
+
+color_background = (255, 255, 255)
+"""Цвет фона"""
 
 height = 1200
 width = (height * 16) // 9
@@ -9,6 +12,32 @@ width = (height * 16) // 9
 font_size = 160
 
 myFont = ImageFont.truetype(r"C:\Users\artem\AppData\Local\Microsoft\Windows\Fonts\Rubik-Regular.ttf", font_size)
+
+
+class Person:
+    """
+
+    :param name: Имя человека
+    :param color: Цвет текста для человека
+    :param coords: Координаты текста. Считаются от левого верхнего угла картинки.
+
+    """
+
+    def __init__(self, name: str, x_coord: float, color: str | tuple[int, int, int] = color_text):
+        """
+
+        :param name: Имя
+        :param x_coord: Координата по OX
+        :param color: Цвет имени
+
+        """
+        self.name = name
+        self.coords = [x_coord, 0]
+        self.color = color
+
+    def draw(self, d: ImageDraw.ImageDraw, font: ImageFont.FreeTypeFont = myFont):
+        d.text(self.coords, self.name, fill=self.color, font=font)
+
 
 koef = 85  # TODO: Сделать авто-скалирующийся коэффициент
 """Коэффициент ширины. Подобран вручную.
@@ -21,11 +50,11 @@ koef = 85  # TODO: Сделать авто-скалирующийся коэфф
 
 print(myFont.getlength('Даниил') + 20 * 2)
 
-name_list = [['Артём', [koef * (16 + 0.25), 0]], ['Аля', [koef * (16 + 0.25), 0]],
-             ["Алиса", [koef * (16 + 0.25), 0]], ["Сашак", [koef * (16 + 0.25), 0]],
-             ["Серёжа", [koef * (16 + 0.25), 0]], ["Влад", [koef * (16 + 0.25), 0]],
-             ["Даниил", [koef * (16 + 0.25), 0]], ["Денис", [koef * (16 + 0.25), 0]],
-             ["Саша", [koef * (16 + 0.25), 0]], ["Дина", [koef * (16 + 0.25), 0]]]
+name_list = [Person('Артём', koef * (16 + 0.25)), Person('Влад', koef * (16 + 0.25)),
+             Person('Сашак', koef * (16 + 0.25)), Person('Алиса', koef * (16 + 0.25)),
+             Person('Серёжа', koef * (16 + 0.25)), Person('Аля', koef * (16 + 0.25)),
+             Person("Даниил", koef * (16 + 0.25)), Person("Денис", koef * (16 + 0.25)),
+             Person("Саша", koef * (16 + 0.25)), Person("Дина", koef * (16 + 0.25))]
 """Список имён с положением на экране формата (x, y).
 
 Коэффициент 0.25 стоит изменить, если нужно центрирование"""
@@ -58,7 +87,7 @@ end_pos = start_pos - diff_pos_y * (len(name_list) - 1)
 В неё переносится текст после выхода за нижнюю часть экрана."""
 
 for i, item in enumerate(name_list):
-    item[1][1] = start_pos - diff_pos_y * i
+    item.coords[1] = start_pos - diff_pos_y * i
 
 percentile = diff_pos_y // step
 """Вычисление количества шагов, необходимых для того, чтобы текст вышел за нижнюю границу картинки"""
@@ -73,23 +102,29 @@ count_iter = percentile * count_cycles
 """Количество кадров"""
 print(count_iter)
 
+im_base = Image.new('RGB', (width, height), color_background)
+d_base = ImageDraw.Draw(im_base)
+d_base.text((10, y_mid), "Спокойной ночи, ", fill=color_text, font=myFont)
+d_base.text((koef * (16 + 7.5), y_mid), "!", fill=color_text, font=myFont)
+
+"""Заготовка заднего фона"""
+
 for i in range(count_iter):
     print(i)
-    im = Image.new('RGB', (width, height), 'white')
+
+    im = im_base.copy()
     d1 = ImageDraw.Draw(im)
-    d1.text((10, y_mid), "Спокойной ночи, ", fill=color, font=myFont)
-    d1.text((koef * (16 + 7.5), y_mid), "!", fill=color, font=myFont)
 
     for name in name_list:
-        d1.text(name[1], name[0], fill=color, font=myFont)
+        name.draw(d1, myFont)
 
     if i % percentile == 0:
-        name_list[(i // percentile) - 1][1][1] = end_pos
+        name_list[(i // percentile) - 1].coords[1] = end_pos
 
     frames.append(im)
 
     for name in name_list:
-        name[1][1] += step
+        name.coords[1] += step
 
     im.save(f'img/r{i}.png')
     # TODO: https://stackoverflow.com/questions/245447/how-do-i-draw-text-at-an-angle-using-pythons-pil
@@ -99,6 +134,6 @@ frames[0].save(
     save_all=True,
     append_images=frames[1:],
     optimize=True,
-    duration=30,
+    duration=25,
     loop=0
 )
