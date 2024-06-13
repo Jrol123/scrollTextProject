@@ -17,13 +17,13 @@ myFont = ImageFont.truetype(r"C:\Users\artem\AppData\Local\Microsoft\Windows\Fon
 class Person:
     """
 
-    :param name: Имя человека
-    :param color: Цвет текста для человека
-    :param coords: Координаты текста. Считаются от левого верхнего угла картинки.
+    :var name: Имя человека
+    :var color: Цвет текста для человека
+    :var coords: Координаты текста. Считаются от левого верхнего угла картинки
 
     """
 
-    def __init__(self, name: str, x_coord: float, color: str | tuple[int, int, int] = color_text):
+    def __init__(self, name: str, x_coord: float, color: str | tuple[int, int, int] = color_text) -> None:
         """
 
         :param name: Имя
@@ -35,7 +35,16 @@ class Person:
         self.coords = [x_coord, 0]
         self.color = color
 
-    def draw(self, d: ImageDraw.ImageDraw, font: ImageFont.FreeTypeFont = myFont):
+    def draw(self, d: ImageDraw.ImageDraw, font: ImageFont.FreeTypeFont = myFont) -> None:
+        """
+        Рисование имени человека на нужном холсте
+
+        :param d: Рисовальщик
+        :param font: Шрифт текста
+
+        :returns: Отрисовывает имя человека
+
+        """
         d.text(self.coords, self.name, fill=self.color, font=font)
 
 
