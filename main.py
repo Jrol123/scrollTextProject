@@ -1,7 +1,10 @@
 from PIL import Image, ImageDraw, ImageFont
 
-color = (0, 0, 0)
+color_text = (0, 0, 0)
 """Цвет текста"""
+
+color_background = (250, 250, 250)
+"""Цвет фона"""
 
 height = 1200
 width = (height * 16) // 9
@@ -10,25 +13,50 @@ font_size = 160
 
 myFont = ImageFont.truetype(r"C:\Users\artem\AppData\Local\Microsoft\Windows\Fonts\Rubik-Regular.ttf", font_size)
 
-koef = 85  # TODO: Сделать авто-скалирующийся коэффициент
-"""Коэффициент ширины. Подобран вручную.
+border = 10
+"""Отступ от левой стенки"""
+start_pos_x = myFont.getlength('Спокойной ночи, ') + border
+"""Стартовая позиция для написания имени"""
 
-Можно сделать массив с буквами и отношением высоты к ширине, и затем всё отмерять, но...
+max_len_name = myFont.getlength('Даниил')
+"""Длина самого длинного имени"""
 
-+ на всё это влияет шрифт...
 
-Переделать ширину под выделяемое пространство на наиболее длинное имя через getlength"""
+class Person:
+    """
 
-print(myFont.getlength('Даниил') + 20 * 2)
+    :var name: Имя человека
+    :type name: str
+    :var color: Цвет текста для человека
+    :type color: str | tuple[int, int, int]
+    :var coords: Координаты текста. Считаются от левого верхнего угла картинки
+    :type coords: list[float, float]
 
-name_list = [['Артём', [koef * (16 + 0.25), 0]], ['Аля', [koef * (16 + 0.25), 0]],
-             ["Алиса", [koef * (16 + 0.25), 0]], ["Сашак", [koef * (16 + 0.25), 0]],
-             ["Серёжа", [koef * (16 + 0.25), 0]], ["Влад", [koef * (16 + 0.25), 0]],
-             ["Даниил", [koef * (16 + 0.25), 0]], ["Денис", [koef * (16 + 0.25), 0]],
-             ["Саша", [koef * (16 + 0.25), 0]], ["Дина", [koef * (16 + 0.25), 0]]]
-"""Список имён с положением на экране формата (x, y).
+    """
 
-Коэффициент 0.25 стоит изменить, если нужно центрирование"""
+    def __init__(self, name: str, color: str | tuple[int, int, int] = color_text) -> None:
+        """
+
+        :param name: Имя
+        :param color: Цвет имени
+
+        """
+        self.name = name
+        self.coords = [start_pos_x + (max_len_name - myFont.getlength(name)) / 2, 0]
+        self.color = color
+
+    def draw(self, d: ImageDraw.ImageDraw, font: ImageFont.FreeTypeFont = myFont) -> None:
+        """
+        Рисование имени человека на нужном холсте
+
+        :param d: Рисовальщик
+        :param font: Шрифт текста
+
+        :returns: Отрисовывает имя человека
+
+        """
+        d.text(self.coords, self.name, fill=self.color, font=font)
+
 
 diff_pos_y = font_size + font_size // 16
 """Разница в позициях между строками текста.
@@ -47,18 +75,25 @@ step = 5
 frames = []
 """Массив кадров"""
 
-start_pos = height - font_size - font_size // 16
+start_pos_y = height - font_size - font_size // 16
 """Нижняя позиция."""
 
-print(start_pos, y_mid + 3 * diff_pos_y)
+print(start_pos_y, y_mid + 3 * diff_pos_y)
 
-end_pos = start_pos - diff_pos_y * (len(name_list) - 1)
+name_list = [Person('Артём', (255, 166, 48)), Person('Влад', (130, 232, 186)),
+             Person('Сашак', (77, 161, 169)), Person('Алиса', (46, 80, 119)),
+             Person('Серёжа', (97, 28, 53)), Person('Аля', (255, 111, 89)),
+             Person("Даниил", (37, 68, 65)), Person("Денис", (67, 170, 139)),
+             Person("Саша", (178, 176, 255)), Person("Дина", (239, 48, 84))]
+"""Список людей"""
+
+end_pos = start_pos_y - diff_pos_y * (len(name_list) - 1)
 """Верхняя позиция.
 
 В неё переносится текст после выхода за нижнюю часть экрана."""
 
 for i, item in enumerate(name_list):
-    item[1][1] = start_pos - diff_pos_y * i
+    item.coords[1] = start_pos_y - diff_pos_y * i
 
 percentile = diff_pos_y // step
 """Вычисление количества шагов, необходимых для того, чтобы текст вышел за нижнюю границу картинки"""
@@ -73,23 +108,29 @@ count_iter = percentile * count_cycles
 """Количество кадров"""
 print(count_iter)
 
+im_base = Image.new('RGB', (width, height), color_background)
+d_base = ImageDraw.Draw(im_base)
+d_base.text((border, y_mid), "Спокойной ночи, ", fill=color_text, font=myFont)
+d_base.text((start_pos_x + max_len_name, y_mid), " !", fill=color_text, font=myFont)
+
+"""Заготовка заднего фона"""
+
 for i in range(count_iter):
     print(i)
-    im = Image.new('RGB', (width, height), 'white')
+
+    im = im_base.copy()
     d1 = ImageDraw.Draw(im)
-    d1.text((10, y_mid), "Спокойной ночи, ", fill=color, font=myFont)
-    d1.text((koef * (16 + 7.5), y_mid), "!", fill=color, font=myFont)
 
     for name in name_list:
-        d1.text(name[1], name[0], fill=color, font=myFont)
+        name.draw(d1, myFont)
 
     if i % percentile == 0:
-        name_list[(i // percentile) - 1][1][1] = end_pos
+        name_list[(i // percentile) - 1].coords[1] = end_pos
 
     frames.append(im)
 
     for name in name_list:
-        name[1][1] += step
+        name.coords[1] += step
 
     im.save(f'img/r{i}.png')
     # TODO: https://stackoverflow.com/questions/245447/how-do-i-draw-text-at-an-angle-using-pythons-pil
