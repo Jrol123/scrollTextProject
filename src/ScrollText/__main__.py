@@ -1,5 +1,4 @@
-import chardet
-from PIL import Image, ImageDraw, ImageFont
+from PIL import ImageDraw, ImageFont
 import json
 import argparse as prs
 import seaborn as sns
@@ -62,7 +61,7 @@ class Person:
         d.text(self.coords, self.name, fill=self.color, font=font)
 
 
-parser = prs.ArgumentParser(prog="backend", description="Описание программы", epilog='Text at the bottom of help')
+parser = prs.ArgumentParser(prog="ScrollText", description="Описание программы", epilog='Text at the bottom of help')
 parser.add_argument('config_path', type=str, help='Путь к конфигурационному файлу')
 parser.add_argument("mode", choices=["v", "c"], type=str, default="v", help="Режим работы программы")
 # TODO: Прикрутить Enum (?)
@@ -83,4 +82,5 @@ if __name__ == '__main__':
     print("\n", args)
 
     name_list = [Person(human.encode("windows-1251").decode("utf-8"), data["people"][human]) for human in data["people"]]
-    print(name_list)
+    for i in name_list:
+        print(i)
