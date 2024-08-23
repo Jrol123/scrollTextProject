@@ -163,3 +163,4 @@ cython_debug/
 /img/
 /docs
 *.gif
+*.json
