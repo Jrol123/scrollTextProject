@@ -5,7 +5,7 @@ save_frame = False
 # ! DEBUG
 
 color_text = (0, 0, 0)
-"""Цвет текста"""
+"""Цвет стандартного текста"""
 
 color_background = (250, 250, 250)
 """Цвет фона"""
@@ -15,6 +15,7 @@ width = (height * 16) // 9
 # TODO: Разобраться с пропорциями
 
 font_size = 160
+# TODO: Переделать под размеры экрана и пропорции
 
 myFont = ImageFont.truetype(r"C:\Users\artem\AppData\Local\Microsoft\Windows\Fonts\Rubik-Regular.ttf", font_size)
 
