@@ -1,5 +1,10 @@
 from PIL import Image, ImageDraw, ImageFont
 
+
+
+save_frame = False
+# ! DEBUG
+
 color_text = (0, 0, 0)
 """Цвет текста"""
 
@@ -8,6 +13,7 @@ color_background = (250, 250, 250)
 
 height = 1200
 width = (height * 16) // 9
+# TODO: Разобраться с пропорциями
 
 font_size = 160
 
@@ -132,8 +138,9 @@ for i in range(count_iter):
     for name in name_list:
         name.coords[1] += step
 
-    im.save(f'img/r{i}.png')
-    # TODO: https://stackoverflow.com/questions/245447/how-do-i-draw-text-at-an-angle-using-pythons-pil
+    if save_frame:
+        im.save(f'img/f{i}.png')
+    # ! DEBUG
 
 frames[0].save(
     'gif.gif',
