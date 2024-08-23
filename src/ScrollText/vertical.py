@@ -1,6 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-
-
+import seaborn as sns
 
 save_frame = False
 # ! DEBUG
@@ -86,11 +85,15 @@ start_pos_y = height - font_size - font_size // 16
 
 print(start_pos_y, y_mid + 3 * diff_pos_y)
 
-name_list = [Person('Артём', (255, 166, 48)), Person('Влад', (130, 232, 186)),
-             Person('Сашак', (77, 161, 169)), Person('Алиса', (46, 80, 119)),
-             Person('Серёжа', (97, 28, 53)), Person('Аля', (255, 111, 89)),
-             Person("Даниил", (37, 68, 65)), Person("Денис", (67, 170, 139)),
-             Person("Саша", (178, 176, 255)), Person("Дина", (239, 48, 84))]
+N = 10
+RGB_tuples = sns.color_palette(None, N, as_cmap=True)
+# TODO: Будет переработано при переходе к файловой системе
+
+name_list = [Person('Артём', RGB_tuples[0]), Person('Влад', RGB_tuples[1]),
+             Person('Сашак', RGB_tuples[2]), Person('Алиса', RGB_tuples[3]),
+             Person('Серёжа', RGB_tuples[4]), Person('Аля', RGB_tuples[5]),
+             Person("Даниил", RGB_tuples[6]), Person("Денис", RGB_tuples[7]),
+             Person("Саша", RGB_tuples[8]), Person("Дина", RGB_tuples[9])]
 """Список людей"""
 
 end_pos = start_pos_y - diff_pos_y * (len(name_list) - 1)
