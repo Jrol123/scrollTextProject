@@ -31,7 +31,7 @@ class Person:
 
     """
 
-    def __init__(self, name: str, color: str | tuple[int, int, int] = color_text) -> None:
+    def __init__(self, name: str, color: str | tuple[int, int, int] | tuple[int, int, int, float] | tuple[int, int, int, int] = color_text) -> None:
         """
 
         :param name: Имя
@@ -41,6 +41,7 @@ class Person:
         self.name = name
         self.coords = [start_pos_x + (max_len_name - myFont.getlength(name)) / 2, 0]
         self.color = color
+        # TODO: Сделать проверку на корректность введённого цвета. ColorName, HEX или же RGB(A). Alpha может быть представлена как float (0-1), так и int(0-255), что тоже надо учесть
 
     def __str__(self) -> str:
         return f"Person(name={self.name}, color={self.color}, coords={self.coords})"
@@ -74,13 +75,17 @@ if __name__ == '__main__':
 
     with open(args.config_path) as f:
         data = json.load(f)
-    count_names = len(data["people"])
-    palette = sns.color_palette(None, count_names, as_cmap=True)
-    for human in data["people"]:
-        print(human.encode("windows-1251").decode("utf-8"))
-    print(f"\nname = {args.output_filename}")
-    print("\n", args)
 
-    name_list = [Person(human.encode("windows-1251").decode("utf-8"), data["people"][human]) for human in data["people"]]
-    for i in name_list:
-        print(i)
+    person_list: list[Person] = []
+    """Список людей"""
+    count_colorless = 0
+    """Количество людей без цвета"""
+    for human_name in data['people']:
+        color = data['people'][human_name]
+        if color == "" or color == []:
+            count_colorless += 1
+        person_list.append(Person(human_name.encode("windows-1251").decode("utf-8"), color))
+
+    rgb_values = [tuple(int(layer * 255) for layer in color) for color in sns.color_palette("magma", n_colors=count_colorless)]
+    """Список RGB-значений для людей без указанного цвета"""
+    print(rgb_values)
