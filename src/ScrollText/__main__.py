@@ -12,6 +12,12 @@ font_size = 160
 # TODO: Переделать под размеры экрана и пропорции
 myFont = ImageFont.truetype(r"C:\Users\artem\AppData\Local\Microsoft\Windows\Fonts\Rubik-Regular.ttf", font_size)
 
+height = 1200
+width = (height * 16) // 9
+# TODO: Разобраться с пропорциями.
+#  Или заставить человека самостоятельно вводить разрешение...
+# TODO: Перенести
+
 border = 10
 """Отступ от левой стенки"""
 # TODO: Сделать задаваемый отступ
@@ -20,6 +26,56 @@ start_pos_x = myFont.getlength('Спокойной ночи, ') + border
 
 max_len_name: float
 """Длина самого длинного имени"""
+
+diff_pos_y = font_size + font_size // 16
+"""Разница в позициях между строками текста.
+
+Считается от левого верхнего угла.
+
+Коэффициент подобран вручную."""
+
+y_mid = height // 2 - font_size // 2
+"""Позиция по y, такая, что при напечатывании в ней текста,
+ его середина будет находиться на настоящей середине картинки."""
+
+step = 5
+"""Сдвиг строк"""
+
+frames = []
+"""Массив кадров"""
+
+start_pos_y = height - font_size - font_size // 16
+"""Нижняя позиция."""
+
+end_pos = start_pos_y - diff_pos_y * (len(name_list) - 1)
+"""Верхняя позиция.
+
+В неё переносится текст после выхода за нижнюю часть экрана."""
+
+for i, item in enumerate(name_list):
+    item.coords[1] = start_pos_y - diff_pos_y * i
+
+percentile = diff_pos_y // step
+"""Вычисление количества шагов, необходимых для того, чтобы текст вышел за нижнюю границу картинки"""
+print(percentile, diff_pos_y / step)
+
+count_cycles = len(name_list) - 0
+"""Количество прокруток.
+
+По-умолчанию один полный круг (len(person_list) шагов)"""
+
+count_iter = percentile * count_cycles
+"""Количество кадров"""
+print(count_iter)
+
+im_base = Image.new('RGB', (width, height), color_background)
+d_base = ImageDraw.Draw(im_base)
+d_base.text((border, y_mid), "Спокойной ночи, ", fill=color_text, font=myFont)
+d_base.text((start_pos_x + max_len_name, y_mid), " !", fill=color_text, font=myFont)
+
+"""Заготовка заднего фона"""
+
+# TODO: Это всё надо будет перенести
 
 
 class Person:
@@ -118,7 +174,8 @@ if __name__ == '__main__':
     """Список людей"""
     count_colorless = 0
     """Количество людей без цвета"""
-    name_list: list[list[str, str | list[int, int, int] | list[int, int, int, float] | list[int, int, int, int] | None]] = []
+    name_list: list[
+        list[str, str | list[int, int, int] | list[int, int, int, float] | list[int, int, int, int] | None]] = []
 
     for human_name in data['people']:
         color = data['people'][human_name]
@@ -144,4 +201,5 @@ if __name__ == '__main__':
         people_list.append(Person(human[0], human[1]))
     for person in people_list: print(person)
 
-
+    if args.mode == 'v':
+        pass
