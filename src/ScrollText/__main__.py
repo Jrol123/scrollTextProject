@@ -18,7 +18,7 @@ border = 10
 start_pos_x = myFont.getlength('Спокойной ночи, ') + border
 """Стартовая позиция для написания имени"""
 
-max_len_name = myFont.getlength('Даниил')
+max_len_name: float
 """Длина самого длинного имени"""
 
 
@@ -118,7 +118,7 @@ if __name__ == '__main__':
     """Список людей"""
     count_colorless = 0
     """Количество людей без цвета"""
-    name_list: list[tuple[str, str | list[int, int, int] | list[int, int, int, float] | list[int, int, int, int]]] = []
+    name_list: list[list[str, str | list[int, int, int] | list[int, int, int, float] | list[int, int, int, int] | None]] = []
 
     for human_name in data['people']:
         color = data['people'][human_name]
@@ -126,7 +126,8 @@ if __name__ == '__main__':
             count_colorless += 1
             color = None
         color = is_valid_color(color)
-        name_list.append((human_name.encode("windows-1251").decode("utf-8"), color))
+        name_list.append([human_name.encode("windows-1251").decode("utf-8"), color])
+    max_len_name = max([myFont.getlength(human[0]) for human in name_list])
 
     rgb_values = [tuple(int(layer * 255) for layer in color) for color in
                   sns.color_palette("magma", n_colors=count_colorless)]
@@ -137,7 +138,7 @@ if __name__ == '__main__':
 
     iter = 0
     for human in name_list:
-        if human[1] == "":
+        if human[1] is None:
             human[1] = rgb_values[iter]
             iter += 1
         people_list.append(Person(human[0], human[1]))
