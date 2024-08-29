@@ -1,81 +1,20 @@
-from PIL import ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 import json
 import argparse as prs
 import seaborn as sns
+from PIL.ImageFont import FreeTypeFont
+
+from ScrollText.vertical import draw_vertical
 
 max_color_val = 255
+
+global_font: FreeTypeFont
 
 color_text = (0, 0, 0)
 """Цвет стандартного текста"""
 
-font_size = 160
-# TODO: Переделать под размеры экрана и пропорции
-myFont = ImageFont.truetype(r"C:\Users\artem\AppData\Local\Microsoft\Windows\Fonts\Rubik-Regular.ttf", font_size)
-
-height = 1200
-width = (height * 16) // 9
-# TODO: Разобраться с пропорциями.
-#  Или заставить человека самостоятельно вводить разрешение...
-# TODO: Перенести
-
-border = 10
-"""Отступ от левой стенки"""
-# TODO: Сделать задаваемый отступ
-start_pos_x = myFont.getlength('Спокойной ночи, ') + border
-"""Стартовая позиция для написания имени"""
-
-max_len_name: float
-"""Длина самого длинного имени"""
-
-diff_pos_y = font_size + font_size // 16
-"""Разница в позициях между строками текста.
-
-Считается от левого верхнего угла.
-
-Коэффициент подобран вручную."""
-
-y_mid = height // 2 - font_size // 2
-"""Позиция по y, такая, что при напечатывании в ней текста,
- его середина будет находиться на настоящей середине картинки."""
-
-step = 5
-"""Сдвиг строк"""
-
-frames = []
-"""Массив кадров"""
-
-start_pos_y = height - font_size - font_size // 16
-"""Нижняя позиция."""
-
-end_pos = start_pos_y - diff_pos_y * (len(name_list) - 1)
-"""Верхняя позиция.
-
-В неё переносится текст после выхода за нижнюю часть экрана."""
-
-for i, item in enumerate(name_list):
-    item.coords[1] = start_pos_y - diff_pos_y * i
-
-percentile = diff_pos_y // step
-"""Вычисление количества шагов, необходимых для того, чтобы текст вышел за нижнюю границу картинки"""
-print(percentile, diff_pos_y / step)
-
-count_cycles = len(name_list) - 0
-"""Количество прокруток.
-
-По-умолчанию один полный круг (len(person_list) шагов)"""
-
-count_iter = percentile * count_cycles
-"""Количество кадров"""
-print(count_iter)
-
-im_base = Image.new('RGB', (width, height), color_background)
-d_base = ImageDraw.Draw(im_base)
-d_base.text((border, y_mid), "Спокойной ночи, ", fill=color_text, font=myFont)
-d_base.text((start_pos_x + max_len_name, y_mid), " !", fill=color_text, font=myFont)
-
-"""Заготовка заднего фона"""
-
-# TODO: Это всё надо будет перенести
+color_background = (250, 250, 250)
+"""Цвет фона"""
 
 
 class Person:
@@ -90,8 +29,10 @@ class Person:
 
     """
 
-    def __init__(self, name: str, color: str | list[int, int, int] | list[int, int, int, float] | list[
-        int, int, int, int] = color_text) -> None:
+    def __init__(self, name: str, color: str |
+                                         tuple[int, int, int] |
+                                         tuple[int, int, int, float] |
+                                         tuple[int, int, int, int], font: FreeTypeFont, start_pos_x: float, max_len_name: float) -> None:
         """
 
         :param name: Имя
@@ -99,7 +40,7 @@ class Person:
 
         """
         self.name = name
-        self.coords = [start_pos_x + (max_len_name - myFont.getlength(name)) / 2, 0]
+        self.coords = [start_pos_x + (max_len_name - font.getlength(name)) / 2, 0]
         self.color = color
 
     def __str__(self) -> str:
@@ -108,7 +49,7 @@ class Person:
     def __repr__(self) -> str:
         return str(self)
 
-    def draw(self, d: ImageDraw.ImageDraw, font: ImageFont.FreeTypeFont = myFont) -> None:
+    def draw(self, d: ImageDraw.ImageDraw, font: ImageFont.FreeTypeFont) -> None:
         """
         Рисование имени человека на нужном холсте
 
@@ -126,8 +67,8 @@ def is_valid_color(color: str |
                           list[int, int, int, float] |
                           list[int, int, int, int] |
                           None) -> ((str |
-                                     list[int, int, int] |
-                                     list[int, int, int, int]) |
+                                     tuple[int, int, int] |
+                                     tuple[int, int, int, int]) |
                                     None):
     """
     Проверка на корректность цвета + его преобразование из float в int.
@@ -143,13 +84,13 @@ def is_valid_color(color: str |
     elif isinstance(color, list):
         if isinstance(color[0], int) and isinstance(color[1], int) and isinstance(color[2], int):
             if len(color) == 3:
-                return color
+                return tuple(color)
             elif len(color) == 4:
                 if isinstance(color[3], int):
-                    return color
+                    return tuple(color)
                 elif isinstance(color[3], float):
-                    color[3] *= max_color_val
-                    return color
+                    color[3] = int(color[3] * max_color_val)
+                    return tuple(color)
     elif color is None:
         return None
     else:
@@ -170,8 +111,23 @@ if __name__ == '__main__':
     with open(args.config_path) as f:
         data = json.load(f)
 
-    person_list: list[Person] = []
-    """Список людей"""
+    color_background = (250, 250, 250)
+    """Цвет фона"""
+
+    font_size = data['font_size']
+    """Размер шрифта"""
+    global_font = ImageFont.truetype(r"C:\Users\artem\AppData\Local\Microsoft\Windows\Fonts\Rubik-Regular.ttf",
+                                     font_size)
+    """Шрифт"""
+
+    height, width = data['height'], data['width']
+
+    # Старая версия с пропорциями
+    # height = 1200
+    # width = (height * 16) // 9
+    ## TODO: Разобраться с пропорциями.
+    ##  Или заставить человека самостоятельно вводить разрешение...
+
     count_colorless = 0
     """Количество людей без цвета"""
     name_list: list[
@@ -184,7 +140,8 @@ if __name__ == '__main__':
             color = None
         color = is_valid_color(color)
         name_list.append([human_name.encode("windows-1251").decode("utf-8"), color])
-    max_len_name = max([myFont.getlength(human[0]) for human in name_list])
+    max_len_name = max([global_font.getlength(human[0]) for human in name_list])
+    """Длина самого длинного имени"""
 
     rgb_values = [tuple(int(layer * 255) for layer in color) for color in
                   sns.color_palette("magma", n_colors=count_colorless)]
@@ -193,13 +150,71 @@ if __name__ == '__main__':
     people_list: list[Person] = []
     """Список людей"""
 
+    border = data['border']
+    """Отступ от левой стенки"""
+    start_pos_x = global_font.getlength(data['first_part'].encode("windows-1251").decode("utf-8")) + border
+    """Стартовая позиция для написания имени"""
+
     iter = 0
     for human in name_list:
         if human[1] is None:
             human[1] = rgb_values[iter]
             iter += 1
-        people_list.append(Person(human[0], human[1]))
+        people_list.append(Person(human[0], human[1], global_font, start_pos_x, max_len_name))
     for person in people_list: print(person)
 
+    diff_pos_y = font_size + font_size // 16
+    """Разница в позициях между строками текста.
+    
+    Считается от левого верхнего угла.
+    
+    Коэффициент подобран вручную."""
+
+    y_mid = height // 2 - font_size // 2
+    """Позиция по y, такая, что при напечатывании в ней текста,
+     его середина будет находиться на настоящей середине картинки."""
+    #! TODO: Сломалась центровка!
+    #   На font_size=150 и 1920x1200 // 4 работает корректно. Ставит в центр Name4.
+    #   На других раскладках ломается
+
+    step = 5
+    """Сдвиг строк"""
+
+
+    start_pos_y = height - font_size - font_size // 16
+    """Нижняя позиция."""
+
+    end_pos = start_pos_y - diff_pos_y * (len(name_list) - 1)
+    """Верхняя позиция.
+    
+    В неё переносится текст после выхода за нижнюю часть экрана."""
+    #! TODO: При малом количестве имён, спавнится внутри картинки.
+    #   Реализовать корректный спавн за границами картинки.
+    #   Вообще, надо сделать размещение не от низа картинки, а от центра
+
+    for i, item in enumerate(people_list):
+        item.coords[1] = start_pos_y - diff_pos_y * i
+
+    percentile = diff_pos_y // step
+    """Вычисление количества шагов, необходимых для того, чтобы текст вышел за нижнюю границу картинки"""
+    print(percentile, diff_pos_y / step)
+
+    count_cycles = len(name_list) - 0
+    """Количество прокруток.
+    
+    По-умолчанию один полный круг (len(people_list) шагов)"""
+
+    count_iter = percentile * count_cycles
+    """Количество кадров"""
+
+    im_base = Image.new('RGB', (width, height), color_background)
+    d_base = ImageDraw.Draw(im_base)
+    d_base.text((border, y_mid), data['first_part'].encode("windows-1251").decode("utf-8"), fill=color_text, font=global_font)
+    d_base.text((start_pos_x + max_len_name, y_mid), data['second_part'].encode("windows-1251").decode("utf-8"), fill=color_text, font=global_font)
+
+    """Заготовка заднего фона"""
+
+    im_base.save(args.output_filename + ".png") #! DEBUG
+
     if args.mode == 'v':
-        pass
+        draw_vertical(im_base, people_list, count_iter, percentile, end_pos, step, global_font, args.output_filename, data['save_frames'])
