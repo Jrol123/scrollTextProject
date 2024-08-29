@@ -1,9 +1,9 @@
 """Скрипт Setup.py для проекта по упаковке"""
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from setuptools import setup, find_packages
 import json, os
 
-load_dotenv()
+# load_dotenv()
 
 
 def read_pipenv_dependencies(fname):
