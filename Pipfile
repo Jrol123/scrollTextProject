@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "ScrollText"
+
+[packages]
+pillow = "~=10.3.0"
+seaborn = "~=0.13.2"
+
+[dev-packages]
+python-dotenv = "~=1.0.1"
+
+[requires]
+python_version = "3.10"
