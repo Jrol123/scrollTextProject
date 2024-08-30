@@ -4,7 +4,7 @@ import argparse as prs
 import seaborn as sns
 from PIL.ImageFont import FreeTypeFont
 
-from ScrollText.vertical import draw_vertical
+from vertical import draw_vertical
 
 max_color_val = 255
 
