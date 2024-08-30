@@ -169,3 +169,4 @@ cython_debug/
 /frames/
 !/example/
 !/example/example.json
+/.idea/

@@ -108,7 +108,7 @@ if __name__ == '__main__':
     color_background = data['color_background']
     """Цвет фона"""
 
-    color_text = data['color_text']
+    color_main_text = data['color_main_text']
     """Цвет текста"""
 
     if color_background == "" or color_background ==[]:
@@ -116,10 +116,10 @@ if __name__ == '__main__':
     else:
         color_background = is_valid_color(color_background)
 
-    if color_text == "" or color_text ==[]:
-        color_text = (0, 0, 0)
+    if color_main_text == "" or color_main_text ==[]:
+        color_main_text = (0, 0, 0)
     else:
-        color_text = is_valid_color(color_text)
+        color_main_text = is_valid_color(color_main_text)
 
 
     font_size = data['font_size']
@@ -220,8 +220,8 @@ if __name__ == '__main__':
 
     im_base = Image.new('RGB', (width, height), color_background)
     d_base = ImageDraw.Draw(im_base)
-    d_base.text((border, y_mid), data['first_part'].encode("windows-1251").decode("utf-8"), fill=color_text, font=global_font)
-    d_base.text((start_pos_x + max_len_name, y_mid), data['second_part'].encode("windows-1251").decode("utf-8"), fill=color_text, font=global_font)
+    d_base.text((border, y_mid), data['first_part'].encode("windows-1251").decode("utf-8"), fill=color_main_text, font=global_font)
+    d_base.text((start_pos_x + max_len_name, y_mid), data['second_part'].encode("windows-1251").decode("utf-8"), fill=color_main_text, font=global_font)
 
     """Заготовка заднего фона"""
 
