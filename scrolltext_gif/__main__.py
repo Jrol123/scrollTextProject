@@ -4,7 +4,7 @@ import argparse as prs
 import seaborn as sns
 from PIL.ImageFont import FreeTypeFont
 
-from .vertical import draw_vertical
+from scrolltext_gif.vertical import draw_vertical
 
 max_color_val = 255
 
@@ -26,7 +26,8 @@ class Person:
     def __init__(self, name: str, color: str |
                                          tuple[int, int, int] |
                                          tuple[int, int, int, float] |
-                                         tuple[int, int, int, int], font: FreeTypeFont, start_pos_x: float, max_len_name: float) -> None:
+                                         tuple[int, int, int, int], font: FreeTypeFont, start_pos_x: float,
+                 max_len_name: float) -> None:
         """
 
         :param name: Имя
@@ -111,21 +112,23 @@ if __name__ == '__main__':
     color_main_text = data['color_main_text']
     """Цвет текста"""
 
-    if color_background == "" or color_background ==[]:
+    if color_background == "" or color_background == []:
         color_background = (250, 250, 250)
     else:
         color_background = is_valid_color(color_background)
 
-    if color_main_text == "" or color_main_text ==[]:
+    if color_main_text == "" or color_main_text == []:
         color_main_text = (0, 0, 0)
     else:
         color_main_text = is_valid_color(color_main_text)
 
-
     font_size = data['font_size']
     """Размер шрифта"""
-    global_font = ImageFont.truetype(r"arial.ttf",
-                                     font_size)
+    if data["font"] == "":
+        global_font = ImageFont.truetype("arial.ttf",
+                                         font_size)
+    else:
+        global_font = ImageFont.truetype(data["font"], font_size)
     """Шрифт"""
 
     height, width = data['height'], data['width']
@@ -184,13 +187,12 @@ if __name__ == '__main__':
     y_mid = height // 2 - font_size // 2
     """Позиция по y, такая, что при напечатывании в ней текста,
      его середина будет находиться на настоящей середине картинки."""
-    #! TODO: Сломалась центровка!
+    # ! TODO: Сломалась центровка!
     #   На font_size=150 и 1920x1200 // 4 работает корректно. Ставит в центр Name4.
     #   На других раскладках ломается
 
     step = 5
     """Сдвиг строк"""
-
 
     start_pos_y = height - font_size - font_size // 16
     """Нижняя позиция."""
@@ -199,7 +201,7 @@ if __name__ == '__main__':
     """Верхняя позиция.
     
     В неё переносится текст после выхода за нижнюю часть экрана."""
-    #! TODO: При малом количестве имён, спавнится внутри картинки.
+    # ! TODO: При малом количестве имён, спавнится внутри картинки.
     #   Реализовать корректный спавн за границами картинки.
     #   Вообще, надо сделать размещение не от низа картинки, а от центра
 
@@ -220,10 +222,13 @@ if __name__ == '__main__':
 
     im_base = Image.new('RGB', (width, height), color_background)
     d_base = ImageDraw.Draw(im_base)
-    d_base.text((border, y_mid), data['first_part'].encode("windows-1251").decode("utf-8"), fill=color_main_text, font=global_font)
-    d_base.text((start_pos_x + max_len_name, y_mid), data['second_part'].encode("windows-1251").decode("utf-8"), fill=color_main_text, font=global_font)
+    d_base.text((border, y_mid), data['first_part'].encode("windows-1251").decode("utf-8"), fill=color_main_text,
+                font=global_font)
+    d_base.text((start_pos_x + max_len_name, y_mid), data['second_part'].encode("windows-1251").decode("utf-8"),
+                fill=color_main_text, font=global_font)
 
     """Заготовка заднего фона"""
 
     if args.mode == 'v':
-        draw_vertical(im_base, people_list, count_iter, percentile, end_pos, step, global_font, args.output_filename, data['save_frames'])
+        draw_vertical(im_base, people_list, count_iter, percentile, end_pos, step, global_font, args.output_filename,
+                      data['save_frames'])
