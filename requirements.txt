@@ -1,2 +1,2 @@
-pillow~=10.3.0
+pillow~=10.4.0
 seaborn~=0.13.2

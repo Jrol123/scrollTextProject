@@ -151,8 +151,11 @@ if __name__ == '__main__':
     max_len_name = max([global_font.getlength(human[0]) for human in name_list])
     """Длина самого длинного имени"""
 
+    color_palette = "magma"
+    if data['color_palette'] != "" and data['color_palette'] != []:
+        color_palette = data['color_palette']
     rgb_values = [tuple(int(layer * 255) for layer in color) for color in
-                  sns.color_palette("magma", n_colors=count_colorless)]
+                  sns.color_palette(color_palette, n_colors=count_colorless)]
     """Генерация RGB-значений для людей без указанного цвета"""
 
     people_list: list[Person] = []

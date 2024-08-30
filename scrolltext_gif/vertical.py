@@ -2,7 +2,7 @@ import os
 from PIL import ImageDraw
 
 def draw_vertical(im_base, person_list, count_iter, percentile, end_pos, step, font, output_name, save_frame):
-    print(f"Будет сгенерировано {count_iter} кадров")
+    print(f"Будет сгенерировано {count_iter} кадров \n")
     frames = []
     """Массив кадров"""
 
@@ -30,6 +30,8 @@ def draw_vertical(im_base, person_list, count_iter, percentile, end_pos, step, f
             im.save(f'frames/f{i}.png')
         # ! DEBUG
 
+    print("\nКадры сгенерированы.\nИдёт сохранение...")
+
     frames[0].save(
         output_name  + '.gif',
         save_all=True,
@@ -38,3 +40,5 @@ def draw_vertical(im_base, person_list, count_iter, percentile, end_pos, step, f
         duration=30,
         loop=0
     )
+
+    print("\nГотово!")
