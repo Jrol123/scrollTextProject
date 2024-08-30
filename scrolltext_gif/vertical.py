@@ -2,6 +2,7 @@ import os
 from PIL import ImageDraw
 
 def draw_vertical(im_base, person_list, count_iter, percentile, end_pos, step, font, output_name, save_frame):
+    print(f"Будет сгенерировано {count_iter} кадров")
     frames = []
     """Массив кадров"""
 
