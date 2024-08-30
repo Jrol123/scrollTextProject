@@ -210,8 +210,8 @@ if __name__ == '__main__':
 
     percentile = diff_pos_y // step
     """Вычисление количества шагов, необходимых для того, чтобы текст вышел за нижнюю границу картинки"""
-    print(percentile, diff_pos_y / step)
-
+    # print(percentile, diff_pos_y / step)
+    #! Debug
     count_cycles = len(name_list) - 0
     """Количество прокруток.
     
