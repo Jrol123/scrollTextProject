@@ -4,7 +4,7 @@ import argparse as prs
 import seaborn as sns
 from PIL.ImageFont import FreeTypeFont
 
-from vertical import draw_vertical
+from .vertical import draw_vertical
 
 max_color_val = 255
 
@@ -111,12 +111,16 @@ if __name__ == '__main__':
     with open(args.config_path) as f:
         data = json.load(f)
 
-    color_background = (250, 250, 250)
+    color_background = data['color_background']
     """Цвет фона"""
+
+    if len(color_background) == 0:
+        color_background = (250, 250, 250)
+
 
     font_size = data['font_size']
     """Размер шрифта"""
-    global_font = ImageFont.truetype(r"C:\Users\artem\AppData\Local\Microsoft\Windows\Fonts\Rubik-Regular.ttf",
+    global_font = ImageFont.truetype(r"arial.ttf",
                                      font_size)
     """Шрифт"""
 
@@ -213,8 +217,6 @@ if __name__ == '__main__':
     d_base.text((start_pos_x + max_len_name, y_mid), data['second_part'].encode("windows-1251").decode("utf-8"), fill=color_text, font=global_font)
 
     """Заготовка заднего фона"""
-
-    im_base.save(args.output_filename + ".png") #! DEBUG
 
     if args.mode == 'v':
         draw_vertical(im_base, people_list, count_iter, percentile, end_pos, step, global_font, args.output_filename, data['save_frames'])

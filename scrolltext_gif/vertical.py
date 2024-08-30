@@ -5,7 +5,7 @@ def draw_vertical(im_base, person_list, count_iter, percentile, end_pos, step, f
     frames = []
     """Массив кадров"""
 
-    if not os.path.exists('frames'):
+    if not os.path.exists('frames') and save_frame:
         os.mkdir('frames')
 
     for i in range(count_iter):
