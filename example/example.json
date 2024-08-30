@@ -1,0 +1,20 @@
+{
+  "people": {
+    "Name1": [0, 0, 0],
+    "Name2": "black",
+    "Name3": [255, 0, 0, 255],
+    "Name4": [245, 40, 145, 0.4],
+    "Name5": "#00FF00"
+  },
+  "height": 800,
+  "width": 1920,
+  "font_size": 150,
+  "color_text": "",
+  "color_background": "",
+  "first_part": "Спокойной ночи, ",
+  "second_part": " !",
+  "border": 10,
+  "colormap": "flare",
+  "save_frames": false
+}
+
