@@ -10,12 +10,6 @@ max_color_val = 255
 
 global_font: FreeTypeFont
 
-color_text = (0, 0, 0)
-"""Цвет стандартного текста"""
-
-color_background = (250, 250, 250)
-"""Цвет фона"""
-
 
 class Person:
     """
@@ -114,8 +108,18 @@ if __name__ == '__main__':
     color_background = data['color_background']
     """Цвет фона"""
 
-    if len(color_background) == 0:
+    color_text = data['color_text']
+    """Цвет текста"""
+
+    if color_background == "" or color_background ==[]:
         color_background = (250, 250, 250)
+    else:
+        color_background = is_valid_color(color_background)
+
+    if color_text == "" or color_text ==[]:
+        color_text = (0, 0, 0)
+    else:
+        color_text = is_valid_color(color_text)
 
 
     font_size = data['font_size']
