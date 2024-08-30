@@ -169,7 +169,7 @@ if __name__ == '__main__':
             human[1] = rgb_values[iter]
             iter += 1
         people_list.append(Person(human[0], human[1], global_font, start_pos_x, max_len_name))
-    for person in people_list: print(person)
+    # for person in people_list: print(person)
 
     diff_pos_y = font_size + font_size // 16
     """Разница в позициях между строками текста.
