@@ -160,6 +160,8 @@ if __name__ == '__main__':
     rgb_values = [tuple(int(layer * 255) for layer in color) for color in
                   sns.color_palette(color_palette, n_colors=count_colorless)]
     """Генерация RGB-значений для людей без указанного цвета"""
+    # TODO: Сделать более плавную расстановку цвета через "ёлочку"
+    #   Вверх-вниз
 
     people_list: list[Person] = []
     """Список людей"""
