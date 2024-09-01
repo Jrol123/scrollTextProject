@@ -203,19 +203,17 @@ if __name__ == '__main__':
         if data['color_palette'] != "" and data['color_palette'] != []:
             color_palette = data['color_palette']
         rgb_values = [tuple(int(layer * 255) for layer in color) for color in
-                      sns.color_palette(color_palette, n_colors=(count_colorless // 2 if count_colorless % 2 != 0
-                                                                 else count_colorless // 2 - 1) + 1)]
+                      sns.color_palette(color_palette, n_colors=(count_colorless // 2 + 1 if count_colorless % 2 != 0
+                                                                 else count_colorless // 2) + 1)]
     # TODO: Сделать возможность вводить "Стандартный цвет". Такой цвет, который будет использован для людей без цвета.
     #   Если такой параметр включён, не генерировать цвета.
-    # TODO: Сделать затемнение одного из цветов, чтобы рядом не было дубликатов.
-    #   Делать "Среднее" между двумя соседними цветами.
 
     # Создание людей
     people_list: list[Person] = []
     """Список людей"""
 
     iter = 0
-    middle = len(name_list) // 2 if len(name_list) % 2 != 0 else len(name_list) // 2 - 1
+    middle = (count_colorless // 2 + 1 if count_colorless % 2 != 0 else count_colorless // 2) + 1 - 1
     """Последний индекс левой половины"""
     if len(rgb_values) != 0:
         for human in name_list:
@@ -229,6 +227,7 @@ if __name__ == '__main__':
     else:
         for human in name_list:
             people_list.append(Person(human[0], human[1], global_font, start_pos_x, max_len_name))
+    # TODO: Сделать задаваемую центровку (кому достанется "выделенный начальный цвет")
     # for person in people_list: print(person)
     # ! DEBUG
 
