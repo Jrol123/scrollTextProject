@@ -171,13 +171,28 @@ if __name__ == '__main__':
     start_pos_x = global_font.getlength(data['first_part'].encode("windows-1251").decode("utf-8")) + border
     """Стартовая позиция для написания имени"""
 
+    def divide(a):
+        if a % 2 == 0:
+            return -a // 2
+        return a // 2 + 1
+
     iter = 0
-    for human in name_list:
-        if human[1] is None:
-            human[1] = rgb_values[iter]
-            iter += 1
-        people_list.append(Person(human[0], human[1], global_font, start_pos_x, max_len_name))
+    middle = len(name_list) // 2 if len(name_list) % 2 != 0 else len(name_list) // 2 - 1
+    """Последний индекс левой половины"""
+    if len(rgb_values) != 0:
+        for human in name_list:
+            if human[1] is None:
+                if iter > middle:
+                    human[1] = rgb_values[middle - (iter - middle)]
+                else:
+                    human[1] = rgb_values[iter]
+                iter += 1
+            people_list.append(Person(human[0], human[1], global_font, start_pos_x, max_len_name))
+    else:
+        for human in name_list:
+            people_list.append(Person(human[0], human[1], global_font, start_pos_x, max_len_name))
     # for person in people_list: print(person)
+    #! DEBUG
 
     diff_pos_y = font_size + font_size // 16
     """Разница в позициях между строками текста.
