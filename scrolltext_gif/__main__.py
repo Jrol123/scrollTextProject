@@ -196,15 +196,19 @@ if __name__ == '__main__':
     """Длина самого длинного имени"""
 
     # Генерация палитры
-    color_palette = "magma"
-    if data['color_palette'] != "" and data['color_palette'] != []:
-        color_palette = data['color_palette']
-    rgb_values = [tuple(int(layer * 255) for layer in color) for color in
-                  sns.color_palette(color_palette, n_colors=(
-                                                                count_colorless // 2 if count_colorless % 2 != 0 else count_colorless // 2 - 1) + 1)]
-    """Генерация RGB-значений для людей без указанного цвета"""
+    rgb_values = []
+    """RGB-значения для людей без указанного цвета"""
+    if color_background != 0:
+        color_palette = "magma"
+        if data['color_palette'] != "" and data['color_palette'] != []:
+            color_palette = data['color_palette']
+        rgb_values = [tuple(int(layer * 255) for layer in color) for color in
+                      sns.color_palette(color_palette, n_colors=(count_colorless // 2 if count_colorless % 2 != 0
+                                                                 else count_colorless // 2 - 1) + 1)]
     # TODO: Сделать возможность вводить "Стандартный цвет". Такой цвет, который будет использован для людей без цвета.
     #   Если такой параметр включён, не генерировать цвета.
+    # TODO: Сделать затемнение одного из цветов, чтобы рядом не было дубликатов.
+    #   Делать "Среднее" между двумя соседними цветами.
 
     # Создание людей
     people_list: list[Person] = []
