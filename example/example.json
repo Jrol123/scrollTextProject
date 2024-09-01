@@ -14,7 +14,8 @@
   "first_part": "Спокойной ночи, ",
   "second_part": " !",
   "border": 10,
-  "colormap": "flare",
+  "color_palette": "magma",
+  "font": "Rubik-Regular.ttf",
   "save_frames": false
 }
 
