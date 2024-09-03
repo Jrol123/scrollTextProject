@@ -180,6 +180,17 @@ if __name__ == '__main__':
     else:
         color_main_text = is_valid_color(color_main_text)
 
+    try:
+        default_name_color = data['default_name_color']
+        if default_name_color != "" and default_name_color != []:
+            default_name_color = is_valid_color(default_name_color)
+        else:
+            default_name_color = None
+    except:
+        default_name_color = None
+
+    # Обработка людей
+
     # Обработка цветов людей
     count_colorless = 0
     """Количество людей без цвета"""
@@ -188,9 +199,13 @@ if __name__ == '__main__':
     for human_name in data['people']:
         color = data['people'][human_name]
         if color == "" or color == []:
-            count_colorless += 1
-            color = None
-        color = is_valid_color(color)
+            if default_name_color is not None:
+                color = default_name_color
+            else:
+                count_colorless += 1
+                color = None
+        else:
+            color = is_valid_color(color)
         name_list.append([human_name.encode("windows-1251").decode("utf-8"), color])
     max_len_name = max([global_font.getlength(human[0]) for human in name_list])
     """Длина самого длинного имени"""
@@ -198,15 +213,13 @@ if __name__ == '__main__':
     # Генерация палитры
     rgb_values = []
     """RGB-значения для людей без указанного цвета"""
-    if count_colorless != 0:
+    if default_name_color is None:
         color_palette = "magma"
         if data['color_palette'] != "" and data['color_palette'] != []:
             color_palette = data['color_palette']
         rgb_values = [tuple(int(layer * 255) for layer in color) for color in
                       sns.color_palette(color_palette, n_colors=(count_colorless // 2 + 1 if count_colorless % 2 != 0
                                                                  else count_colorless // 2) + 1)]
-    # TODO: Сделать возможность вводить "Стандартный цвет". Такой цвет, который будет использован для людей без цвета.
-    #   Если такой параметр включён, не генерировать цвета.
 
     # Создание людей
     people_list: list[Person] = []
@@ -227,7 +240,6 @@ if __name__ == '__main__':
     else:
         for human in name_list:
             people_list.append(Person(human[0], human[1], global_font, start_pos_x, max_len_name))
-    # TODO: Сделать задаваемую центровку (кому достанется "выделенный начальный цвет")
     # for person in people_list: print(person)
     # ! DEBUG
 
