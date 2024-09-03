@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "scrolltext_gif"
-version = "0.9.4.5"
+version = "0.9.5"
 description = "Module for generating gif-s with scrolling vertical text"
 authors = ["Artemii <angap4@gmail.com>"]
 license = "MIT"
