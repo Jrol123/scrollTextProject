@@ -198,7 +198,7 @@ if __name__ == '__main__':
     # Генерация палитры
     rgb_values = []
     """RGB-значения для людей без указанного цвета"""
-    if color_background != 0:
+    if count_colorless != 0:
         color_palette = "magma"
         if data['color_palette'] != "" and data['color_palette'] != []:
             color_palette = data['color_palette']
