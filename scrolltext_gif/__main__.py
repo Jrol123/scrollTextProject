@@ -83,12 +83,12 @@ def is_valid_color(color: str |
         raise TypeError("Неверное наименование цвета в кавычках")
 
     elif isinstance(color, list):
-        if all((isinstance(color_element, int) and 0 <= color_element <= 255) for color_element in color[0:3]):
+        if all((isinstance(color_element, int) and 0 <= color_element <= max_color_val) for color_element in color[0:3]):
             if len(color) == 3:
                 return tuple(color)
 
             elif len(color) == 4:
-                if isinstance(color[3], int) and 0 <= color[3] <= 255:
+                if isinstance(color[3], int) and 0 <= color[3] <= max_color_val:
                     return tuple(color)
                 elif isinstance(color[3], float) and 0 <= color[3] <= 1:
                     color[3] = int(color[3] * max_color_val)
