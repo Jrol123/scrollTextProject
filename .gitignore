@@ -167,6 +167,5 @@ cython_debug/
 *.png
 *.json
 /frames/
-!/example/
-!/example/example.json
+!/example/*
 /.idea/
