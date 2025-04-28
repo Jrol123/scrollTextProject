@@ -83,7 +83,8 @@ def is_valid_color(color: str |
         raise TypeError("Неверное наименование цвета в кавычках")
 
     elif isinstance(color, list):
-        if all((isinstance(color_element, int) and 0 <= color_element <= max_color_val) for color_element in color[0:3]):
+        if all((isinstance(color_element, int) and 0 <= color_element <= max_color_val) for color_element in
+               color[0:3]):
             if len(color) == 3:
                 return tuple(color)
 
@@ -141,6 +142,7 @@ if __name__ == '__main__':
     ## TODO: Разобраться с пропорциями.
     ##  Или заставить человека самостоятельно вводить разрешение...
 
+    # TODO: Добавить возможность делать спец-слова для отдельных людей, и вычислять отступ от самого большого
     border = data['border']
     """Отступ от левой стенки"""
     start_pos_x = global_font.getlength(data['first_part'].encode("windows-1251").decode("utf-8")) + border
@@ -261,14 +263,14 @@ if __name__ == '__main__':
     count_iter = percentile * count_cycles
     """Количество кадров"""
 
+    # Заготовка заднего фона
+
     im_base = Image.new('RGB', (width, height), color_background)
     d_base = ImageDraw.Draw(im_base)
     d_base.text((border, y_mid), data['first_part'].encode("windows-1251").decode("utf-8"), fill=color_main_text,
                 font=global_font)
     d_base.text((start_pos_x + max_len_name, y_mid), data['second_part'].encode("windows-1251").decode("utf-8"),
                 fill=color_main_text, font=global_font)
-
-    """Заготовка заднего фона"""
 
     if args.mode == 'v':
         draw_vertical(im_base, people_list, count_iter, percentile, end_pos, step, global_font, args.output_filename,
