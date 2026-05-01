@@ -31,6 +31,10 @@
 
 ```
 
+```sh:example/example_command.sh
+
+```
+
 Результат:
 ![Example GIF](example/output.gif)
 
