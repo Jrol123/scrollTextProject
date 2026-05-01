@@ -4,6 +4,8 @@
 
 ## Пример использования
 
+`json` файл:
+
 ```json:example/example.json
 {
   "people": {
@@ -30,6 +32,8 @@
 
 
 ```
+
+Консольная команда:
 
 ```sh:example/example_command.sh
 scrolltext ./example.json v
