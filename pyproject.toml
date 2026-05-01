@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "scrolltext_gif"
-version = "0.9.5"
+version = "0.9.5.5"
 description = "Module for generating gif-s with scrolling vertical text"
 authors = ["Artemii <angap4@gmail.com>"]
 license = "MIT"
@@ -13,6 +13,8 @@ seaborn = "^0.13.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
+flake8-pyproject = "^1.2.4"
+isort = "^8.0.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -23,3 +25,6 @@ docs = ["sphinx"]
 
 [tool.poetry.urls]
 repository = "https://github.com/Jrol123/scrollTextProject"
+
+[tool.poetry.scripts]
+scrolltext = "scrolltext_gif.__main__:cli"

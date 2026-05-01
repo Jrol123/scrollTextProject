@@ -1,14 +1,38 @@
-import json
 import argparse as prs
+import json
+from typing import TYPE_CHECKING
+
 import seaborn as sns
-from PIL import Image, ImageDraw, ImageFont, ImageColor
+from PIL import Image, ImageColor, ImageDraw, ImageFont
 from PIL.ImageFont import FreeTypeFont
 
 from scrolltext_gif.vertical import draw_vertical
 
+if TYPE_CHECKING:
+    from typing import Literal, Optional
+
 max_color_val = 255
 
 global_font: FreeTypeFont
+
+parser = prs.ArgumentParser(
+    prog="ScrollText",
+    description="Описание программы",
+    epilog="Text at the bottom of help",
+)
+parser.add_argument("config_path", type=str, help="Путь к конфигурационному файлу")
+parser.add_argument(
+    "mode", choices=["v", "c"], type=str, default="v", help="Режим работы программы"
+)
+# TODO: Прикрутить Enum (?)
+parser.add_argument(
+    metavar="name",
+    nargs="?",
+    dest="output_filename",
+    type=str,
+    default="output",
+    help="Название выходного файла",
+)
 
 
 class Person:
@@ -23,11 +47,19 @@ class Person:
 
     """
 
-    def __init__(self, name: str, color: str |
-                                         tuple[int, int, int] |
-                                         tuple[int, int, int, float] |
-                                         tuple[int, int, int, int], font: FreeTypeFont, start_pos_x: float,
-                 max_len_name: float) -> None:
+    def __init__(
+        self,
+        name: str,
+        color: (
+            str
+            | tuple[int, int, int]
+            | tuple[int, int, int, float]
+            | tuple[int, int, int, int]
+        ),
+        font: FreeTypeFont,
+        start_pos_x: float,
+        max_len_name: float,
+    ) -> None:
         """
 
         :param name: Имя
@@ -57,14 +89,15 @@ class Person:
         d.text(self.coords, self.name, fill=self.color, font=font)
 
 
-def is_valid_color(color: str |
-                          list[int, int, int] |
-                          list[int, int, int, float] |
-                          list[int, int, int, int] |
-                          None) -> ((str |
-                                     tuple[int, int, int] |
-                                     tuple[int, int, int, int]) |
-                                    None):
+def is_valid_color(
+    color: (
+        str
+        | tuple[int, int, int]
+        | tuple[int, int, int, float]
+        | tuple[int, int, int, int]
+        | None
+    ),
+) -> (str | tuple[int, int, int] | tuple[int, int, int, int]) | None:
     """
     Проверка на корректность цвета + его преобразование из float в int.
     :param color:
@@ -74,8 +107,13 @@ def is_valid_color(color: str |
     """
     if isinstance(color, str):
         if color.startswith("#"):
-            if len(color[1:]) == 6 and color[1:].isalnum() and all(
-                    char.isdigit() or char.lower() in 'abcdef' for char in color[1:]):
+            if (
+                len(color[1:]) == 6
+                and color[1:].isalnum()
+                and all(
+                    char.isdigit() or char.lower() in "abcdef" for char in color[1:]
+                )
+            ):
                 return color
             raise ValueError("Неверное HEX значение цвета")
         elif color in ImageColor.colormap.keys():
@@ -83,8 +121,10 @@ def is_valid_color(color: str |
         raise TypeError("Неверное наименование цвета в кавычках")
 
     elif isinstance(color, list):
-        if all((isinstance(color_element, int) and 0 <= color_element <= max_color_val) for color_element in
-               color[0:3]):
+        if all(
+            (isinstance(color_element, int) and 0 <= color_element <= max_color_val)
+            for color_element in color[0:3]
+        ):
             if len(color) == 3:
                 return tuple(color)
 
@@ -106,35 +146,29 @@ def is_valid_color(color: str |
         raise TypeError("Неверный тип цвета")
 
 
-parser = prs.ArgumentParser(prog="ScrollText", description="Описание программы", epilog='Text at the bottom of help')
-parser.add_argument('config_path', type=str, help='Путь к конфигурационному файлу')
-parser.add_argument("mode", choices=["v", "c"], type=str, default="v", help="Режим работы программы")
-# TODO: Прикрутить Enum (?)
-parser.add_argument(metavar="name", nargs='?', dest='output_filename', type=str,
-                    default="output", help='Название выходного файла')
-
-if __name__ == '__main__':
-    # Ввод параметров
-    args = parser.parse_args()
-    with open(args.config_path) as f:
+def main_processing(
+    config_path: str,
+    mode: "Literal['v', 'c']",
+    output_filename: "Optional[str]" = None,
+):    
+    with open(config_path) as f:
         data = json.load(f)
-    color_background = data['color_background']
+    color_background = data["color_background"]
     """Цвет фона"""
-    color_main_text = data['color_main_text']
+    color_main_text = data["color_main_text"]
     """Цвет текста"""
 
     # Обработка шрифта
-    font_size = data['font_size']
+    font_size = data["font_size"]
     """Размер шрифта"""
     if data["font"] == "":
-        global_font = ImageFont.truetype("arial.ttf",
-                                         font_size)
+        global_font = ImageFont.truetype("arial.ttf", font_size)
     else:
         global_font = ImageFont.truetype(data["font"], font_size)
     """Шрифт"""
 
     # Обработка размеров
-    height, width = data['height'], data['width']
+    height, width = data["height"], data["width"]
 
     # Старая версия с пропорциями
     # height = 1200
@@ -143,9 +177,12 @@ if __name__ == '__main__':
     ##  Или заставить человека самостоятельно вводить разрешение...
 
     # TODO: Добавить возможность делать спец-слова для отдельных людей, и вычислять отступ от самого большого
-    border = data['border']
+    border = data["border"]
     """Отступ от левой стенки"""
-    start_pos_x = global_font.getlength(data['first_part'].encode("windows-1251").decode("utf-8")) + border
+    start_pos_x = (
+        global_font.getlength(data["first_part"].encode("windows-1251").decode("utf-8"))
+        + border
+    )
     """Стартовая позиция для написания имени"""
 
     diff_pos_y = font_size + font_size // 16
@@ -165,7 +202,7 @@ if __name__ == '__main__':
     start_pos_y = height - font_size - font_size // 16
     """Нижняя позиция."""
 
-    end_pos = start_pos_y - diff_pos_y * (len(data['people']) - 1)
+    end_pos = start_pos_y - diff_pos_y * (len(data["people"]) - 1)
     """Верхняя позиция.
     В неё переносится текст после выхода за нижнюю часть экрана."""
     # TODO: При малом количестве имён, спавнится внутри картинки.
@@ -183,7 +220,7 @@ if __name__ == '__main__':
         color_main_text = is_valid_color(color_main_text)
 
     try:
-        default_name_color = data['default_name_color']
+        default_name_color = data["default_name_color"]
         if default_name_color != "" and default_name_color != []:
             default_name_color = is_valid_color(default_name_color)
         else:
@@ -197,9 +234,17 @@ if __name__ == '__main__':
     count_colorless = 0
     """Количество людей без цвета"""
     name_list: list[
-        list[str, str | list[int, int, int] | list[int, int, int, float] | list[int, int, int, int] | None]] = []
-    for human_name in data['people']:
-        color = data['people'][human_name]
+        tuple[
+            str,
+            str
+            | tuple[int, int, int]
+            | tuple[int, int, int, float]
+            | tuple[int, int, int, int]
+            | None,
+        ]
+    ] = []
+    for human_name in data["people"]:
+        color = data["people"][human_name]
         if color == "" or color == []:
             if default_name_color is not None:
                 color = default_name_color
@@ -217,18 +262,31 @@ if __name__ == '__main__':
     """RGB-значения для людей без указанного цвета"""
     if default_name_color is None:
         color_palette = "magma"
-        if data['color_palette'] != "" and data['color_palette'] != []:
-            color_palette = data['color_palette']
-        rgb_values = [tuple(int(layer * 255) for layer in color) for color in
-                      sns.color_palette(color_palette, n_colors=(count_colorless // 2 + 1 if count_colorless % 2 != 0
-                                                                 else count_colorless // 2) + 1)]
+        if data["color_palette"] != "" and data["color_palette"] != []:
+            color_palette = data["color_palette"]
+        rgb_values = [
+            tuple(int(layer * 255) for layer in color)
+            for color in sns.color_palette(
+                color_palette,
+                n_colors=(
+                    count_colorless // 2 + 1
+                    if count_colorless % 2 != 0
+                    else count_colorless // 2
+                )
+                + 1,
+            )
+        ]
 
     # Создание людей
     people_list: list[Person] = []
     """Список людей"""
 
     iter = 0
-    middle = (count_colorless // 2 + 1 if count_colorless % 2 != 0 else count_colorless // 2) + 1 - 1
+    middle = (
+        (count_colorless // 2 + 1 if count_colorless % 2 != 0 else count_colorless // 2)
+        + 1
+        - 1
+    )
     """Последний индекс левой половины"""
     if len(rgb_values) != 0:
         for human in name_list:
@@ -238,10 +296,14 @@ if __name__ == '__main__':
                 else:
                     human[1] = rgb_values[iter]
                 iter += 1
-            people_list.append(Person(human[0], human[1], global_font, start_pos_x, max_len_name))
+            people_list.append(
+                Person(human[0], human[1], global_font, start_pos_x, max_len_name)
+            )
     else:
         for human in name_list:
-            people_list.append(Person(human[0], human[1], global_font, start_pos_x, max_len_name))
+            people_list.append(
+                Person(human[0], human[1], global_font, start_pos_x, max_len_name)
+            )
     # for person in people_list: print(person)
     # ! DEBUG
 
@@ -265,13 +327,39 @@ if __name__ == '__main__':
 
     # Заготовка заднего фона
 
-    im_base = Image.new('RGB', (width, height), color_background)
+    im_base = Image.new("RGB", (width, height), color_background)
     d_base = ImageDraw.Draw(im_base)
-    d_base.text((border, y_mid), data['first_part'].encode("windows-1251").decode("utf-8"), fill=color_main_text,
-                font=global_font)
-    d_base.text((start_pos_x + max_len_name, y_mid), data['second_part'].encode("windows-1251").decode("utf-8"),
-                fill=color_main_text, font=global_font)
+    d_base.text(
+        (border, y_mid),
+        data["first_part"].encode("windows-1251").decode("utf-8"),
+        fill=color_main_text,
+        font=global_font,
+    )
+    d_base.text(
+        (start_pos_x + max_len_name, y_mid),
+        data["second_part"].encode("windows-1251").decode("utf-8"),
+        fill=color_main_text,
+        font=global_font,
+    )
 
-    if args.mode == 'v':
-        draw_vertical(im_base, people_list, count_iter, percentile, end_pos, step, global_font, args.output_filename,
-                      data['save_frames'])
+    if mode == "v":
+        draw_vertical(
+            im_base,
+            people_list,
+            count_iter,
+            percentile,
+            end_pos,
+            step,
+            global_font,
+            output_filename,
+            data["save_frames"],
+        )
+
+
+def cli():
+    args = parser.parse_args()
+    main_processing(args.config_path, args.mode, args.output_filename)
+
+
+if __name__ == "__main__":
+    cli()
