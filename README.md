@@ -32,7 +32,7 @@
 ```
 
 ```sh:example/example_command.sh
-
+scrolltext ./example.json v
 ```
 
 Результат:
